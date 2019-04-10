@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 
 library(readxl)
 library(janitor)
@@ -14,7 +14,75 @@ library(ggplot2)
 library(tidyverse)
 ```
 
-```{r}
+```{r download_data, cache=TRUE}
+download.file("https://registrar.fas.harvard.edu/files/fas-registrar/files/class_enrollment_summary_by_term_3.22.19.xlsx",
+              destfile = "spring_2019.xlsx",
+              mode = "wb")
+
+download.file("https://registrar.fas.harvard.edu/files/fas-registrar/files/class_enrollment_summary_by_term_10.24.18.xlsx",
+              destfile = "fall_2018.xlsx",
+              mode = "wb")
+
+download.file("https://registrar.fas.harvard.edu/files/fas-registrar/files/class_enrollment_summary_by_term_03.06.18.xlsx",
+              destfile = "spring_2018.xlsx",
+              mode = "wb")
+
+download.file("https://registrar.fas.harvard.edu/files/fas-registrar/files/class_enrollment_summary_by_term_10.20.17.xlsx",
+              destfile = "fall_2017.xlsx",
+              mode = "wb")
+
+download.file("http://registrar.fas.harvard.edu/files/fas-registrar/files/class_enrollment_summary_by_term_2017_03_07_final_0.xlsx",
+              destfile = "spring_2017.xlsx",
+              mode = "wb")
+
+download.file("http://registrar.fas.harvard.edu/files/fas-registrar/files/copy_of_class_enrollment_summary_by_term_10.06.2016.xlsx",
+              destfile = "fall_2016.xlsx",
+              mode = "wb")
+
+spring_2019 <- read_excel("spring_2019.xlsx", skip = 3) %>% 
+  clean_names() %>% 
+  filter(!is.na(course_name)) %>% 
+  select(course_id, course_title, course_name, u_grad) %>% 
+  arrange(desc(u_grad)) %>% 
+  slice(1:20)
+
+fall_2018 <- read_excel("fall_2018.xlsx", skip = 2) %>% 
+  clean_names() %>% 
+  filter(!is.na(course_name)) %>% 
+  select(course_id, course_title, course_name, u_grad) %>% 
+  arrange(desc(u_grad)) %>% 
+  slice(1:20)
+
+spring_2018 <- read_excel("spring_2018.xlsx", skip = 3) %>% 
+  clean_names() %>% 
+  filter(!is.na(course_name)) %>% 
+  select(course_id, course_title, course_name, u_grad) %>% 
+  arrange(desc(u_grad)) %>% 
+  slice(1:20)
+
+fall_2017 <- read_excel("fall_2017.xlsx", skip = 3) %>% 
+  clean_names() %>% 
+  filter(!is.na(course_name)) %>% 
+  select(course_id, course_title, course_name, u_grad) %>% 
+  arrange(desc(u_grad)) %>% 
+  slice(1:20)
+
+spring_2017 <- read_excel("spring_2017.xlsx", skip = 3) %>% 
+  clean_names() %>% 
+  filter(!is.na(course_name)) %>% 
+  select(course_id, course_title, course_name, u_grad) %>% 
+  arrange(desc(u_grad)) %>% 
+  slice(1:20)
+
+fall_2016 <- read_excel("fall_2016.xlsx", skip = 3) %>% 
+  clean_names() %>% 
+  filter(!is.na(course_name)) %>% 
+  select(course_id, course_title, course_name, u_grad) %>% 
+  arrange(desc(u_grad)) %>% 
+  slice(1:20)
+```
+
+```{r join_data}
 
 ```
 
