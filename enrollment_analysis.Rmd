@@ -15,6 +15,8 @@ library(tidyverse)
 ```
 
 ```{r download_data, cache=TRUE}
+# I wanted to look at recent enrollment trends, so I downloaded the enrollment data for the past 6 semesters from the Registrar's Office website.
+
 download.file("https://registrar.fas.harvard.edu/files/fas-registrar/files/class_enrollment_summary_by_term_3.22.19.xlsx",
               destfile = "spring_2019.xlsx",
               mode = "wb")
@@ -38,6 +40,13 @@ download.file("http://registrar.fas.harvard.edu/files/fas-registrar/files/class_
 download.file("http://registrar.fas.harvard.edu/files/fas-registrar/files/copy_of_class_enrollment_summary_by_term_10.06.2016.xlsx",
               destfile = "fall_2016.xlsx",
               mode = "wb")
+
+# I read each Excel file into a tibble and saved them by semester. I only
+# selected the course_id, course_title, course_name, and u_grad (undergrad
+# enrollment) variables because those were the ones that interested me. In
+# hindsight, course_id and course_title were not relevant to my analysis. If I
+# were taking another look at this data, I might study graduate enrollment
+# instead or look at how section structure affects enrollment size.
 
 spring_2019 <- read_excel("spring_2019.xlsx", skip = 3) %>% 
   clean_names() %>% 
@@ -83,6 +92,9 @@ fall_2016 <- read_excel("fall_2016.xlsx", skip = 3) %>%
 ```
 
 ```{r bind_data}
+# To look at trends in the data, I had to bind the data tables together. I named
+# them each by season and year, and I saved these names as an id.
+
 top20 <- bind_rows("Fall 2016" = fall_2016,
                    "Spring 2017" = spring_2017,
                    "Fall 2017" = fall_2017,
@@ -95,15 +107,31 @@ top20 <- bind_rows("Fall 2016" = fall_2016,
 ## What proportion of the top 20 enrolled courses each semester have "Intro" or "Principles" in their names?
 
 ```{r plot}
+# Here I did the bulk of my analysis and created my plot
+
 top20_intro <- top20 %>% 
+  
+  # I grouped by semester to see the trends I was looking for
+  
   group_by(semester) %>% 
+  
+  # I used the summarize function to calculate the percentage of courses with
+  # 'intro' or 'principles' in the name
+  
   summarize(intro = 100 *sum(str_detect(course_name, "Intro*") | str_detect(course_name, "Principles*")) / n()) %>% 
+  
+  # I had to re-order the semesters chronologically for the plot.
+  
   mutate(semester = fct_relevel(semester, c("Fall 2016",
                    "Spring 2017",
                    "Fall 2017",
                    "Spring 2018",
                    "Fall 2018",
                    "Spring 2019"))) %>% 
+  
+  # I wanted to highlight differences in season, so I used the if_else function
+  # in combination with the str_detect function.
+  
   mutate(season = if_else(str_detect(semester, "Fall*"), "Fall", "Spring")) %>% 
   ggplot(aes(x = semester, y = intro, fill = season)) +
   geom_col(show.legend = FALSE) +
@@ -111,6 +139,10 @@ top20_intro <- top20 %>%
        x = "Semester",
        y = "Percentage of Top 20 Courses",
        caption = "Source: Harvard FAS Registrar's Office") +
+  
+  # I thought these colors worked nicely for seasons, and the gray theme
+  # complemented them nicely.
+  
   scale_fill_brewer(type = "qual", palette = "Dark2") +
   theme_gray()
 
