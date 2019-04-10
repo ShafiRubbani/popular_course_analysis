@@ -83,21 +83,36 @@ fall_2016 <- read_excel("fall_2016.xlsx", skip = 3) %>%
 ```
 
 ```{r bind_data}
-top20 <- bind_rows("fall_2016" = fall_2016,
-                   "spring_2017" = spring_2017,
-                   "fall_2017" = fall_2017,
-                   "spring_2018" = spring_2018,
-                   "fall_2018" = fall_2018,
-                   "spring_2019" = spring_2019,
+top20 <- bind_rows("Fall 2016" = fall_2016,
+                   "Spring 2017" = spring_2017,
+                   "Fall 2017" = fall_2017,
+                   "Spring 2018" = spring_2018,
+                   "Fall 2018" = fall_2018,
+                   "Spring 2019" = spring_2019,
                    .id = "semester")
 ```
 
-```{r graph}
+## What proportion of the top 20 enrolled courses each semester have "Intro" or "Principles" in their names?
+
+```{r plot}
 top20_intro <- top20 %>% 
   group_by(semester) %>% 
   summarize(intro = 100 *sum(str_detect(course_name, "Intro*") | str_detect(course_name, "Principles*")) / n()) %>% 
-  ggplot(aes(x = semester, y = intro)) +
-  geom_col()
+  mutate(semester = fct_relevel(semester, c("Fall 2016",
+                   "Spring 2017",
+                   "Fall 2017",
+                   "Spring 2018",
+                   "Fall 2018",
+                   "Spring 2019"))) %>% 
+  mutate(season = if_else(str_detect(semester, "Fall*"), "Fall", "Spring")) %>% 
+  ggplot(aes(x = semester, y = intro, fill = season)) +
+  geom_col(show.legend = FALSE) +
+  labs(title = "Percentage of Intro Courses by Semester",
+       x = "Semester",
+       y = "Percentage of Top 20 Courses",
+       caption = "Source: Harvard FAS Registrar's Office") +
+  scale_fill_brewer(type = "qual", palette = "Dark2") +
+  theme_gray()
 
 top20_intro
 ```
