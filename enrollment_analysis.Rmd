@@ -93,6 +93,12 @@ top20 <- bind_rows("fall_2016" = fall_2016,
 ```
 
 ```{r graph}
+top20_intro <- top20 %>% 
+  group_by(semester) %>% 
+  summarize(intro = 100 *sum(str_detect(course_name, "Intro*") | str_detect(course_name, "Principles*")) / n()) %>% 
+  ggplot(aes(x = semester, y = intro)) +
+  geom_col()
 
+top20_intro
 ```
 
